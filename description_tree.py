@@ -16,8 +16,8 @@ class DescriptionTree:
     def copy(self):
         """ Creates a copy of this description tree """
         c = DescriptionTree(self.graph)
-        c.labels = copy.deepcopy(self.labels)
-        c.edges = copy.deepcopy(self.edges)
+        c.labels = copy.copy(self.labels)
+        c.edges = copy.copy(self.edges)
         return c
 
     def unravel(self, node, depth):
@@ -40,7 +40,7 @@ class DescriptionTree:
     def binary_product(self, t):
         """ Returns the product of this tree with tree t"""
         p = DescriptionTree(self.graph)
-        p.labels = copy.deepcopy(self.labels)
+        p.labels = copy.copy(self.labels)
         p.labels.intersection_update(t.labels)
         for e in self.edges.keys():
             if e in t.edges:
