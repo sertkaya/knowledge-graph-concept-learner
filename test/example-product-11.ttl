@@ -1,0 +1,32 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ex: <http://example.org/> .
+
+ex:x1 rdf:type ex:F .
+ex:x1 rdf:type ex:M .
+ex:x1 ex:r1 ex:y1 .
+ex:x1 ex:r2 ex:z1 .
+ex:y1 rdf:type ex:A .
+ex:y1 rdf:type ex:B .
+ex:z1 rdf:type ex:B .
+ex:z1 rdf:type ex:C .
+
+ex:x2 rdf:type ex:F .
+ex:x2 rdf:type ex:M .
+ex:x2 ex:r1 ex:y2 .
+ex:x2 ex:r1 ex:z2 .
+ex:y2 rdf:type ex:A .
+ex:z2 rdf:type ex:B .
+
+ex:x3 rdf:type ex:F .
+ex:x3 ex:r2 ex:y3 .
+ex:x3 ex:r1 ex:z3 .
+ex:y3 rdf:type ex:A .
+ex:z3 rdf:type ex:B .
+
+ex:x4 rdf:type ex:F .
+ex:x4 ex:r2 ex:y4 .
+ex:x4 ex:r1 ex:z4 .
+ex:y4 rdf:type ex:C .
+ex:z4 rdf:type ex:D .
+
+

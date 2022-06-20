@@ -4,6 +4,5 @@
 ex:x1 rdf:type ex:M .
 ex:x1 rdf:type ex:F .
 
-ex:x2 rdf:type ex:F .
 ex:x2 rdf:type ex:M .
 
