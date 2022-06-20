@@ -10,7 +10,8 @@ class DescriptionTree:
         """ Creates an empty description tree from an RDF-Graph. """
         self.graph = graph
         self.labels = set()
-        self.edges = set()
+        # self.edges = set()
+        self.edges = {}
 
     def copy(self):
         c = DescriptionTree(self.graph)
@@ -30,30 +31,42 @@ class DescriptionTree:
                 if predicate == RDF_TYPE:
                     self.labels.add(object)
                 else:
-                    # tree.edges.setdefault(predicate, set()).add(g.unravel(object, depth - 1))
                     child = DescriptionTree(self.graph)
-                    self.edges.add((predicate, child.unravel(object, depth - 1)))
+                    # self.edges.add((predicate, child.unravel(object, depth - 1)))
+                    self.edges.setdefault(predicate, set()).add(child.unravel(object, depth - 1))
             self.labels.add(OWL_THING)
             return self
 
     def product(self, trees, depth):
         if depth == 0:
-            p = self.copy()
+            # product tree
+            pt = self.copy()
             for tree in trees:
-               p.labels.intersection_update(tree.labels)
-            return(p)
+               pt.labels.intersection_update(tree.labels)
+            return(pt)
+        else:
+            pt = DescriptionTree(self.graph)
+            return(pt)
 
 
-    def print(self,n):
+    def print(self, n, g):
         """ Prints the description graph. """
         for i in range(n):
             print("\t", end="")
-        print(self.labels)
-        for edge, t in self.edges:
+        for l in self.labels:
+            print(l.n3(g.namespace_manager), end=" ")
+        print()
+        # for edge, t in self.edges:
+        #     for i in range(n):
+        #         print("\t", end="")
+        #     print(edge.n3(g.namespace_manager))
+        #     t.print(n+1, g)
+        for edge in self.edges.keys():
             for i in range(n):
                 print("\t", end="")
-            print(edge)
-            t.print(n+1)
+            print(edge.n3(g.namespace_manager))
+            for t in self.edges.get(edge):
+                t.print(n+1, g)
 
 
 base_URI = "http://example.org/"
@@ -61,15 +74,18 @@ x1 = URIRef(base_URI + "x1")
 x2 = URIRef(base_URI + "x2")
 
 g = Graph()
-g.parse("test/example-product-0.ttl")
+g.parse("test/example-product-1.ttl")
+g.bind("ex", base_URI)
 
 t1 = DescriptionTree(g)
-t1.unravel(x1, 0)
+t1.unravel(x1, 1)
 
-t2 = DescriptionTree(g)
-t2.unravel(x2, 0)
+t1.print(0, g)
 
-p = t1.product({t2}, 0)
-
-for t in p.labels:
-    print(t)
+# t2 = DescriptionTree(g)
+# t2.unravel(x2, 0)
+#
+# p = t1.product({t2}, 0)
+#
+# for t in p.labels:
+#     print(t)
