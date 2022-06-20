@@ -10,7 +10,6 @@ class DescriptionTree:
         """ Creates an empty description tree from an RDF-Graph. """
         self.graph = graph
         self.labels = set()
-        # self.edges = set()
         self.edges = {}
 
     def copy(self):
@@ -32,7 +31,6 @@ class DescriptionTree:
                     self.labels.add(object)
                 else:
                     child = DescriptionTree(self.graph)
-                    # self.edges.add((predicate, child.unravel(object, depth - 1)))
                     self.edges.setdefault(predicate, set()).add(child.unravel(object, depth - 1))
             self.labels.add(OWL_THING)
             return self
@@ -56,11 +54,6 @@ class DescriptionTree:
         for l in self.labels:
             print(l.n3(g.namespace_manager), end=" ")
         print()
-        # for edge, t in self.edges:
-        #     for i in range(n):
-        #         print("\t", end="")
-        #     print(edge.n3(g.namespace_manager))
-        #     t.print(n+1, g)
         for edge in self.edges.keys():
             for i in range(n):
                 print("\t", end="")
