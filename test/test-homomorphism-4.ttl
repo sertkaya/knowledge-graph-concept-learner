@@ -1,0 +1,17 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ex: <http://example.org/> .
+
+ex:a rdf:type ex:A .
+ex:a ex:r ex:x .
+ex:a ex:r ex:y .
+
+ex:x rdf:type ex:C .
+ex:y rdf:type ex:D .
+
+ex:b rdf:type ex:A .
+ex:b rdf:type ex:B .
+ex:b ex:r ex:c .
+
+ex:c rdf:type ex:C .
+
+# false
