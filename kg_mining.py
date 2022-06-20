@@ -19,99 +19,102 @@ class KgMining:
         self.graph = Graph()
         self.graph.parse(file)
 
-    def mmsc(self, X, d):
-        tmp = X.copy()
+    def mmsc(self, individuals, depth):
+        """ Computes the mmsc of the set of individuals until depth """
+        tmp = individuals.copy()
         if len(tmp) == 0:
             # return an empty description tree: bottom
-            t = DescriptionTree(self.graph)
-            return t
+            dt = DescriptionTree(self.graph)
+            return dt
         else:
-            t1 = DescriptionTree(self.graph)
-            x1 = tmp.pop()
-            t1.unravel(x1, d)
-            s = set()
-            for x in tmp:
-                t = DescriptionTree(self.graph)
-                t.unravel(x, d)
-                s.add(t)
-            p = t1.product(s)
-            return p
+            tree_1 = DescriptionTree(self.graph)
+            ind_1 = tmp.pop()
+            tree_1.unravel(ind_1, depth)
+            trees = set()
+            for ind in tmp:
+                dt = DescriptionTree(self.graph)
+                dt.unravel(ind, depth)
+                trees.add(dt)
+            product_tree = tree_1.product(trees)
+            return product_tree
 
-    def compute_attributes(self, X, d):
+    def compute_attributes(self, individuals, depth):
+        """ Returns the set of attributes computed from a set of individuals up to depth."""
         attributes = set()
-        # for x in X:
-        #     t = DescriptionTree(self.graph)
-        #     # unravel to depth 0, i.e., get only the labels
-        #     # the set of labels of x in X is the N_C
-        #     t.unravel(x, 0)
-        #     attributes.add(t)
 
-        # get types (for N_C)
+        # get types of individuals (for N_C)
         tmp = set()
-        for x in X:
-            for c in self.graph.objects(x, RDF_TYPE):
-                tmp.add(c)
+        for x in individuals:
+            for cls in self.graph.objects(x, RDF_TYPE):
+                tmp.add(cls)
         tmp.add(OWL_THING)
         tmp.add(OWL_NOTHING)
 
-        for c in tmp:
-            t = DescriptionTree(self.graph)
-            t.labels.add(c)
+        # add unique types to attributes
+        for cls in tmp:
+            dt = DescriptionTree(self.graph)
+            dt.labels.add(cls)
             duplicate = False
+            # check if attribute a is already added
             for a in attributes:
-                if t.is_equivalent_to(a):
+                if dt.is_equivalent_to(a):
                     duplicate = True
                     break
             if not duplicate:
-                attributes.add(t)
+                attributes.add(dt)
 
-        if d == 0:
+        if depth == 0:
             return attributes
 
         # get properties (for N_R)
         properties = set()
-        for x in X:
+        for x in individuals:
             for p in self.graph.predicates(x, None):
                 properties.add(p)
 
-        for xs in list(map(set, powerset(X))):
+        # construct attributes with existential and mmsc, add to attributes set
+        for xs in list(map(set, powerset(individuals))):
             if len(xs) == 0:
                 continue
             for r in properties:
                 if r == RDF_TYPE:
                     continue
                 # add exists r. mmsc(s) for s subset of X to attributes
-                t = DescriptionTree(self.graph)
-                mmsc = self.mmsc(xs, d - 1)
-                # print(str(xs) + ":" + r + ":" + mmsc.to_str(self.graph))
-                # t.edges[r] = {mmsc}
-                t.edges.setdefault(r, set()).add(mmsc)
+                dt = DescriptionTree(self.graph)
+                mmsc = self.mmsc(xs, depth - 1)
+                dt.edges.setdefault(r, set()).add(mmsc)
                 duplicate = False
                 for a in attributes:
-                    if t.is_equivalent_to(a):
+                    if dt.is_equivalent_to(a):
                         duplicate = True
                         break
                 if not duplicate:
-                    attributes.add(t)
+                    attributes.add(dt)
         return attributes
 
-    def build_formal_context(self, X, d):
-        M = self.compute_attributes(X, d)
-        I = []
-        # for g in X:
-        #     t = DescriptionTree(g)
-        #     t.unravel(g, d)
-        #     for m in M:
+    def build_formal_context(self, individuals, depth):
+        """ Returns the formal context induced by a set of individuals for a depth."""
+        attrs = self.compute_attributes(individuals, depth)
+        attributes = ()
+        attributes_str = ()
+        for m in attrs:
+            attributes += (m,)
+            attributes_str += (m.to_str(self.graph),)
+        objects = ()
+        incidence = ()
+        for g in individuals:
+            tg = DescriptionTree(self.graph)
+            tg.unravel(g, depth)
+            gm = ()
+            for m in attributes:
+                if tg.is_subsumed_by(m):
+                    # print(tg.to_str(self.graph) + " ⊑ " + m.to_str(self.graph))
+                    gm = gm + (True,)
+                else:
+                    gm = gm + (False,)
+            objects += (g,)
+            incidence += (gm,)
 
-        c = Context(X, M, I)
+        c = Context(objects, attributes_str, incidence)
+
         return c
-
-# fc = kg.build_formal_context({a, b, c}, 1)
-# print("Objects:")
-# print(fc.objects)
-# print("Attributes:")
-# print(fc.properties)
-
-# c = kg.mmsc({a,b}, d)
-# print("mmsc:")
-# c.print(d, kg.graph)

@@ -14,6 +14,7 @@ class DescriptionTree:
         self.edges = {}
 
     def copy(self):
+        """ Creates a copy of this description tree """
         c = DescriptionTree(self.graph)
         c.labels = copy.deepcopy(self.labels)
         c.edges = copy.deepcopy(self.edges)
@@ -37,7 +38,7 @@ class DescriptionTree:
             return self
 
     def binary_product(self, t):
-        # product tree
+        """ Returns the product of this tree with tree t"""
         p = DescriptionTree(self.graph)
         p.labels = copy.deepcopy(self.labels)
         p.labels.intersection_update(t.labels)
@@ -49,17 +50,18 @@ class DescriptionTree:
         return p
 
     def product(self, trees):
+        """ Returns the product of this tree with the trees in the set trees"""
         p = self.copy()
         for t in trees:
             p = p.binary_product(t)
         return p
 
     def print(self, n, g):
-        """ Prints the description graph. """
+        """ Pretty prints the description graph. """
         for i in range(n):
             print("\t", end="")
-        for l in self.labels:
-            print(l.n3(g.namespace_manager), end=" ")
+        for label in self.labels:
+            print(label.n3(g.namespace_manager), end=" ")
         print()
         for edge in self.edges.keys():
             for i in range(n):
@@ -69,36 +71,39 @@ class DescriptionTree:
                 t.print(n + 1, g)
 
     def to_str(self, g):
-        s = ""
+        """ Returns a string representation in the Description Logics notation"""
+        string = ""
         len_labels = len(self.labels)
         i = 0
-        for l in self.labels:
-            if l == OWL_THING:
-                s += "⊤"
-            elif l == OWL_NOTHING:
-                s += "⊥"
+        for label in self.labels:
+            if label == OWL_THING:
+                string += "⊤"
+            elif label == OWL_NOTHING:
+                string += "⊥"
             else:
-                s += l.n3(g.namespace_manager)
+                string += label.n3(g.namespace_manager)
+            # just to avoid trailing ⊓
             if i < (len_labels - 1):
-                s += " ⊓ "
+                string += " ⊓ "
             i += 1
 
         keys = self.edges.keys()
         len_keys = len(keys)
         if len_keys != 0 and len_labels != 0:
-            s += " ⊓ "
+            string += " ⊓ "
         i = 0
         for edge in keys:
-            s += "∃" + edge.n3(g.namespace_manager) + ".("
+            string += "∃" + edge.n3(g.namespace_manager) + ".("
             for t in self.edges.get(edge):
-                s += t.to_str(g)
-            s += ")"
+                string += t.to_str(g)
+            string += ")"
             if i < (len_keys - 1):
-                s += " ⊓ "
+                string += " ⊓ "
             i += 1
-        return s
+        return string
 
     def is_homomorphic_to(self, t):
+        """ Checks if this tree is homomorphic to tree t"""
         if len(self.edges) == 0:
             return self.labels.issubset(t.labels)
         else:
@@ -117,43 +122,11 @@ class DescriptionTree:
             return True
 
     def is_subsumed_by(self, t):
+        """ Checks if the concept description represented by this tree
+        is subsumed by the concept description represented by tree t"""
         return t.is_homomorphic_to(self)
 
     def is_equivalent_to(self, t):
+        """ Checks if the concept description represented by this tree
+        is equivalent to the concept description represented by tree t"""
         return t.is_homomorphic_to(self) and self.is_homomorphic_to(t)
-#
-# base_URI = "http://example.org/"
-# x1 = URIRef(base_URI + "x1")
-# x2 = URIRef(base_URI + "x2")
-# x3 = URIRef(base_URI + "x3")
-# x4 = URIRef(base_URI + "x4")
-#
-# g = Graph()
-# g.parse("test/example-product-11.ttl")
-# g.bind("ex", base_URI)
-#
-# t1 = DescriptionTree(g)
-# t1.unravel(x1, 1)
-# print("t1:")
-# t1.print(0, g)
-#
-# t2 = DescriptionTree(g)
-# t2.unravel(x2, 1)
-# print("t2:")
-# t2.print(0, g)
-#
-# t3 = DescriptionTree(g)
-# t3.unravel(x3, 1)
-# print("t3:")
-# t3.print(0, g)
-#
-# # t4 = DescriptionTree(g)
-# # t4.unravel(x4, 1)
-# # print("t4:")
-# # t4.print(0, g)
-#
-# # p = t1.product({t2, t3, t4})
-# p = t1.product({t2, t3})
-#
-# print("Product:")
-# p.print(0, g)
