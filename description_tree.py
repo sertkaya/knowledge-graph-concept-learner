@@ -1,4 +1,5 @@
 from rdflib import Graph, URIRef
+import copy
 
 RDF_TYPE = URIRef("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
 OWL_THING = URIRef("http://www.w3.org/2002/07/owl#thing")
@@ -10,6 +11,12 @@ class DescriptionTree:
         self.graph = graph
         self.labels = set()
         self.edges = set()
+
+    def copy(self):
+        c = DescriptionTree(self.graph)
+        c.labels = copy.deepcopy(self.labels)
+        c.edges = copy.deepcopy(self.edges)
+        return(c)
 
     def unravel(self, node, depth):
         """ Unravels the RDF-Graph at the given node until the given depth. """
@@ -29,15 +36,13 @@ class DescriptionTree:
             self.labels.add(OWL_THING)
             return self
 
-    def product(self, tree1, trees_rest, depth):
+    def product(self, trees, depth):
         if depth == 0:
-            p = DescriptionTree(self.graph)
-            p.unravel(tree1, 0)
-            for tree in trees_rest:
-                tmp = DescriptionTree(self.graph)
-                tmp.unravel(tree, 0)
-                p.labels.intersection_update(tmp.labels)
+            p = self.copy()
+            for tree in trees:
+               p.labels.intersection_update(tree.labels)
             return(p)
+
 
     def print(self,n):
         """ Prints the description graph. """
@@ -52,11 +57,19 @@ class DescriptionTree:
 
 
 base_URI = "http://example.org/"
-a = URIRef(base_URI + "a")
-b = URIRef(base_URI + "b")
+x1 = URIRef(base_URI + "x1")
+x2 = URIRef(base_URI + "x2")
 
 g = Graph()
-g.parse("unravel-test-felix.ttl")
-tree = DescriptionTree(g)
-tree.unravel(a, 5)
-tree.print(0)
+g.parse("test/example-product-0.ttl")
+
+t1 = DescriptionTree(g)
+t1.unravel(x1, 0)
+
+t2 = DescriptionTree(g)
+t2.unravel(x2, 0)
+
+p = t1.product({t2}, 0)
+
+for t in p.labels:
+    print(t)
