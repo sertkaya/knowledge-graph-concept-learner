@@ -1,0 +1,11 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ex: <http://example.org/> .
+
+ex:a rdf:type ex:Female .
+ex:a ex:sibling ex:b .
+
+ex:b rdf:type ex:Female .
+ex:b ex:sibling ex:c .
+ex:b ex:child ex:d .
+
+ex:c ex:child ex:e .
