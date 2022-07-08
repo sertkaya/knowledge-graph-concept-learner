@@ -7,39 +7,39 @@ OWL_NOTHING = URIRef("http://www.w3.org/2002/07/owl#nothing")
 
 
 class DescriptionTree:
-    def __init__(self, graph):
+    def __init__(self, dg):
         """ Creates an empty description tree from an RDF-Graph. """
-        self.graph = graph
+        self.dg = dg
         self.labels = set()
         self.edges = {}
 
     def copy(self):
         """ Creates a copy of this description tree """
-        c = DescriptionTree(self.graph)
+        c = DescriptionTree(self.dg)
         c.labels = copy.copy(self.labels)
         c.edges = copy.copy(self.edges)
         return c
 
-    def unravel(self, node, depth):
-        """ Unravels the RDF-Graph at the given node until the given depth. """
-        if depth == 0:
-            for label in self.graph.objects(node, RDF_TYPE):
-                self.labels.add(label)
-            self.labels.add(OWL_THING)
-            return self
-        else:
-            for predicate, object in self.graph.predicate_objects(node):
-                if predicate == RDF_TYPE:
-                    self.labels.add(object)
-                else:
-                    child = DescriptionTree(self.graph)
-                    self.edges.setdefault(predicate, set()).add(child.unravel(object, depth - 1))
-            self.labels.add(OWL_THING)
-            return self
+#    def unravel(self, node, depth):
+#        """ Unravels the RDF-Graph at the given node until the given depth. """
+#        if depth == 0:
+#            for label in self.graph.objects(node, RDF_TYPE):
+#                self.labels.add(label)
+#            self.labels.add(OWL_THING)
+#            return self
+#        else:
+#            for predicate, object in self.graph.predicate_objects(node):
+#                if predicate == RDF_TYPE:
+#                    self.labels.add(object)
+#                else:
+#                    child = DescriptionTree(self.graph)
+#                    self.edges.setdefault(predicate, set()).add(child.unravel(object, depth - 1))
+#            self.labels.add(OWL_THING)
+#            return self
 
     def binary_product(self, t):
         """ Returns the product of this tree with tree t"""
-        p = DescriptionTree(self.graph)
+        p = DescriptionTree(self.dg)
         p.labels = copy.copy(self.labels)
         p.labels.intersection_update(t.labels)
         for e in self.edges.keys():
@@ -56,21 +56,21 @@ class DescriptionTree:
             p = p.binary_product(t)
         return p
 
-    def print(self, n, g):
+    def print(self, n):
         """ Pretty prints the description graph. """
         for i in range(n):
             print("\t", end="")
         for label in self.labels:
-            print(label.n3(g.namespace_manager), end=" ")
+            print(label.n3(self.dg.graph.namespace_manager), end=" ")
         print()
         for edge in self.edges.keys():
             for i in range(n):
                 print("\t", end="")
-            print(edge.n3(g.namespace_manager))
+            print(edge.n3(self.dg.graph.namespace_manager))
             for t in self.edges.get(edge):
-                t.print(n + 1, g)
+                t.print(n + 1)
 
-    def to_str(self, g):
+    def to_str(self):
         """ Returns a string representation in the Description Logics notation"""
         string = ""
         len_labels = len(self.labels)
@@ -81,7 +81,7 @@ class DescriptionTree:
             elif label == OWL_NOTHING:
                 string += "⊥"
             else:
-                string += label.n3(g.namespace_manager)
+                string += label.n3(self.dg.graph.namespace_manager)
             # just to avoid trailing ⊓
             if i < (len_labels - 1):
                 string += " ⊓ "
@@ -93,9 +93,9 @@ class DescriptionTree:
             string += " ⊓ "
         i = 0
         for edge in keys:
-            string += "∃" + edge.n3(g.namespace_manager) + ".("
+            string += "∃" + edge.n3(self.dg.graph.namespace_manager) + ".("
             for t in self.edges.get(edge):
-                string += t.to_str(g)
+                string += t.to_str()
             string += ")"
             if i < (len_keys - 1):
                 string += " ⊓ "

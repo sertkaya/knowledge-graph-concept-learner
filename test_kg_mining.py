@@ -49,7 +49,7 @@ bulgaria = URIRef(base_URI + "Q219")
 #
 kg = KgMining("test/test-eu-members-rdf.ttl")
 print("Parsed input")
-depth = 1
+depth = 2
 start_time = time.time()
 print("Started timing")
 # fc = kg.build_formal_context({germany, poland, france}, depth)
