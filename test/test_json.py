@@ -1,9 +1,9 @@
 import json
 
-with open('test/eu-members.json') as f:
+with open('test_files/eu-members.json') as f:
     d = json.load(f)
 
-out = open('test/eu-members.ttl', 'w')
+out = open('test_files/eu-members.ttl', 'w')
 
 for x in d:
     s = x.get('c')
