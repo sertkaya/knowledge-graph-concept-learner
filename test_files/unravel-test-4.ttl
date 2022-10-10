@@ -8,4 +8,5 @@ ex:a ex:child ex:d .
 ex:b ex:child ex:c .
 ex:c rdf:type ex:Male .
 
-ex:d rdf:type ex:Male .
+ex:d ex:child ex:e .
+ex:e rdf:type ex:Male .

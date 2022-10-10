@@ -1,11 +1,9 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix ex: <http://example.org/> .
 
-ex:a rdf:type ex:Male .
+ex:a rdf:type ex:Female .
 ex:a ex:marriedTo ex:b .
-ex:a ex:child ex:c .
-ex:c rdf:type ex:Female .
 
+ex:b rdf:type ex:Male .
 ex:b ex:marriedTo ex:a .
-ex:b ex:child ex:c .
 

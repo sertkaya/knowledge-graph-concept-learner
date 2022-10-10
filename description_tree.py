@@ -1,58 +1,96 @@
 from rdflib import URIRef
 import copy
+from line_profiler_pycharm import profile
+import math
+from functools import total_ordering
 
 RDF_TYPE = URIRef("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
 OWL_THING = URIRef("http://www.w3.org/2002/07/owl#thing")
 OWL_NOTHING = URIRef("http://www.w3.org/2002/07/owl#nothing")
 
 
+@total_ordering
 class DescriptionTree:
-    def __init__(self, dg):
-        """ Creates an empty description tree from an RDF-Graph. """
+    # dictionary of description trees
+    # keys are sorted labels, values are description trees
+    dts = {}
+
+    # def __init__(self, dg):
+    #     """ Creates an empty description tree from an RDF-Graph. """
+    #     self.dg = dg
+    #     self.labels = set()
+    #     self.edges = {}
+
+    def __new__(cls, dg, labels, edges):
+        # print("labels:" + str(labels))
+        # print("edges:" + str(edges))
+        key = DescriptionTree.compute_key(cls, labels, edges)
+        # print("key:" + key)
+        if key in DescriptionTree.dts:
+            dt = DescriptionTree.dts.get(key)
+            # print("Found:" + str(dt))
+            # print("id:" + hex(id(dt)))
+            # print("Found:" + dt.to_str())
+            return dt
+        else:
+            self = object.__new__(cls)
+            DescriptionTree.dts[key] = self
+            return self
+
+    def __init__(self, dg, labels, edges):
+        """ Creates or gets a description tree with the given labels. """
         self.dg = dg
-        self.labels = set()
-        self.edges = {}
+        self.labels = labels
+        self.edges = edges
+
+    def __lt__(self, other):
+        return id(self) < id(other)
+
+    def compute_key(self, labels, edges):
+        # for label in labels:
+        #    print(label.n3(self.dg.graph.namespace_manager), end=", ")
+        key = ""
+        for l in sorted(labels):
+            key += hex(id(l)) + "_"
+        for edge in sorted(edges.keys()):
+            key += hex(id(edge)) + "("
+            for c in sorted(edges.get(edge)):
+                # print("c:" + str(type(c)))
+                key += self.compute_key(self, c.labels, c.edges)
+            key += ")"
+        return key
 
     def copy(self):
         """ Creates a copy of this description tree """
-        c = DescriptionTree(self.dg)
-        c.labels = copy.copy(self.labels)
-        c.edges = copy.copy(self.edges)
+        # c = DescriptionTree(self.dg)
+        # c.labels = copy.copy(self.labels)
+        # c.edges = copy.copy(self.edges)
+        labels = copy.copy(self.labels)
+        edges = copy.copy(self.edges)
+        c = DescriptionTree(self.dg, labels, edges)
         return c
-
-#    def unravel(self, node, depth):
-#        """ Unravels the RDF-Graph at the given node until the given depth. """
-#        if depth == 0:
-#            for label in self.graph.objects(node, RDF_TYPE):
-#                self.labels.add(label)
-#            self.labels.add(OWL_THING)
-#            return self
-#        else:
-#            for predicate, object in self.graph.predicate_objects(node):
-#                if predicate == RDF_TYPE:
-#                    self.labels.add(object)
-#                else:
-#                    child = DescriptionTree(self.graph)
-#                    self.edges.setdefault(predicate, set()).add(child.unravel(object, depth - 1))
-#            self.labels.add(OWL_THING)
-#            return self
 
     def binary_product(self, t):
         """ Returns the product of this tree with tree t"""
-        p = DescriptionTree(self.dg)
-        p.labels = copy.copy(self.labels)
-        p.labels.intersection_update(t.labels)
+        # p = DescriptionTree(self.dg)
+        # p.labels = copy.copy(self.labels)
+        # p.labels.intersection_update(t.labels)
+        labels = copy.copy(self.labels)
+        labels.intersection_update(t.labels)
+        edges = {}
         for e in self.edges.keys():
             if e in t.edges:
                 for c1 in self.edges.get(e):
                     for c2 in t.edges.get(e):
-                        p.edges.setdefault(e, set()).add(c1.binary_product(c2))
-        return p
+                        edges.setdefault(e, set()).add(c1.binary_product(c2))
+        return DescriptionTree(self.dg, labels, edges)
 
     def product(self, trees):
         """ Returns the product of this tree with the trees in the set trees"""
         p = self.copy()
         for t in trees:
+            # print("------------------")
+            # t.print(0)
             p = p.binary_product(t)
         return p
 
@@ -61,14 +99,14 @@ class DescriptionTree:
         for i in range(n):
             print("\t", end="")
         for label in self.labels:
-            print(label.n3(self.dg.graph.namespace_manager), end=" ")
-        print()
+            print(label.n3(self.dg.graph.namespace_manager), end=", ")
         for edge in self.edges.keys():
             for i in range(n):
                 print("\t", end="")
-            print(edge.n3(self.dg.graph.namespace_manager))
             for t in self.edges.get(edge):
-                t.print(n + 1)
+                print(edge.n3(self.dg.graph.namespace_manager) + ".(", end="")
+                t.print(n)
+                print(")", end=", ")
 
     def to_str(self):
         """ Returns a string representation in the Description Logics notation"""
@@ -87,17 +125,27 @@ class DescriptionTree:
                 string += " ⊓ "
             i += 1
 
-        keys = self.edges.keys()
-        len_keys = len(keys)
-        if len_keys != 0 and len_labels != 0:
+        edges = self.edges.keys()
+        len_edges = len(edges)
+        if len_edges != 0 and len_labels != 0:
             string += " ⊓ "
         i = 0
-        for edge in keys:
-            string += "∃" + edge.n3(self.dg.graph.namespace_manager) + ".("
-            for t in self.edges.get(edge):
-                string += t.to_str()
-            string += ")"
-            if i < (len_keys - 1):
+        for edge in edges:
+            # print("edge:" + str(edge))
+            children = self.edges.get(edge)
+            len_children = len(children)
+            j = 0
+            for c in children:
+                string += "∃" + edge.n3(self.dg.graph.namespace_manager) + ".("
+                # print("c:" + str(c))
+                string += c.to_str()
+                string += ")"
+                # just to avoid trailing ⊓
+                if j < (len_children - 1):
+                    string += " ⊓ "
+                j += 1
+            # just to avoid trailing ⊓
+            if i < (len_edges - 1):
                 string += " ⊓ "
             i += 1
         return string
