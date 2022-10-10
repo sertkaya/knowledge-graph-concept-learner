@@ -50,11 +50,11 @@ class TestKgMining:
         # 10
         # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia, slovakia, slovenia, belgium}, depth)
         # 15
-        fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia, slovakia, slovenia, belgium, croatia,
-                                     ireland, sweden, finland, denmark, luxembourg}, depth)
-        # 20
         # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia, slovakia, slovenia, belgium, croatia,
-        #                               cyprus, malta, ireland, sweden, finland, denmark, luxembourg, spain, romania, hungary}, depth)
+        #                              ireland, sweden, finland, denmark, luxembourg}, depth)
+        # 20
+        fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia, slovakia, slovenia, belgium, croatia,
+                                      cyprus, malta, ireland, sweden, finland, denmark, luxembourg, spain, romania, hungary}, depth)
         # print("Built formal context")
         l = fc.lattice
         end_time = time.time()
