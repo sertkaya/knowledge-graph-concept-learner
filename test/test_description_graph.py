@@ -3,14 +3,6 @@ from description_graph import DescriptionGraph
 
 class TestDescriptionGraph:
 
-    # x1 = URIRef(base_URI + "x1")
-    # x2 = URIRef(base_URI + "x2")
-    # x3 = URIRef(base_URI + "x3")
-    # x4 = URIRef(base_URI + "x4")
-
-    # print("dt:")
-    # dt.print(0)
-
     def test_unravel(self):
         base_URI = "http://example.org/"
         a = URIRef(base_URI + "a")

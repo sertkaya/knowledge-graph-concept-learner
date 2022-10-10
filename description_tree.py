@@ -15,22 +15,10 @@ class DescriptionTree:
     # keys are sorted labels, values are description trees
     dts = {}
 
-    # def __init__(self, dg):
-    #     """ Creates an empty description tree from an RDF-Graph. """
-    #     self.dg = dg
-    #     self.labels = set()
-    #     self.edges = {}
-
     def __new__(cls, dg, labels, edges):
-        # print("labels:" + str(labels))
-        # print("edges:" + str(edges))
         key = DescriptionTree.compute_key(cls, labels, edges)
-        # print("key:" + key)
         if key in DescriptionTree.dts:
             dt = DescriptionTree.dts.get(key)
-            # print("Found:" + str(dt))
-            # print("id:" + hex(id(dt)))
-            # print("Found:" + dt.to_str())
             return dt
         else:
             self = object.__new__(cls)
@@ -47,24 +35,18 @@ class DescriptionTree:
         return id(self) < id(other)
 
     def compute_key(self, labels, edges):
-        # for label in labels:
-        #    print(label.n3(self.dg.graph.namespace_manager), end=", ")
         key = ""
         for l in sorted(labels):
             key += hex(id(l)) + "_"
         for edge in sorted(edges.keys()):
             key += hex(id(edge)) + "("
             for c in sorted(edges.get(edge)):
-                # print("c:" + str(type(c)))
                 key += self.compute_key(self, c.labels, c.edges)
             key += ")"
         return key
 
     def copy(self):
         """ Creates a copy of this description tree """
-        # c = DescriptionTree(self.dg)
-        # c.labels = copy.copy(self.labels)
-        # c.edges = copy.copy(self.edges)
         labels = copy.copy(self.labels)
         edges = copy.copy(self.edges)
         c = DescriptionTree(self.dg, labels, edges)
@@ -72,9 +54,6 @@ class DescriptionTree:
 
     def binary_product(self, t):
         """ Returns the product of this tree with tree t"""
-        # p = DescriptionTree(self.dg)
-        # p.labels = copy.copy(self.labels)
-        # p.labels.intersection_update(t.labels)
         labels = copy.copy(self.labels)
         labels.intersection_update(t.labels)
         edges = {}
@@ -89,8 +68,6 @@ class DescriptionTree:
         """ Returns the product of this tree with the trees in the set trees"""
         p = self.copy()
         for t in trees:
-            # print("------------------")
-            # t.print(0)
             p = p.binary_product(t)
         return p
 
