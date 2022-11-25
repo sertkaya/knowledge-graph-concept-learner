@@ -74,7 +74,7 @@ class TestKgMining:
             print("=====================================================")
 
 
-    def test_kg_mining_example(self):
+    def test_kg_mining_example_paper(self):
         base_URI = "http://example.org/"
         a = URIRef(base_URI + "a")
         b = URIRef(base_URI + "b")
@@ -89,6 +89,39 @@ class TestKgMining:
         # print("Started timing")
         # 3
         fc = kg.build_formal_context({a, b, c, d, e}, depth)
+        l = fc.lattice
+        # end_time = time.time()
+        # l = fc.lattice.graphviz(view=True)
+        print("Number of objects: " + str(len(fc.objects)))
+        print("Number of attributes:" + str(len(fc.properties)))
+        print("Attributes:" + str(fc.properties))
+        # print("Attributes")
+        # for p in fc.properties:
+        #     print("p:" + p)
+        print("Number of concepts: " + str(len(l)))
+        # print("Execution time:" + str(end_time - start_time))
+        # for extent, intent in l:
+        #     print(extent)
+        #     print(intent)
+        #     print(len(intent))
+        #     print("=====================================================")
+        for c in l:
+            print(c)
+            print("=====================================================")
+
+
+    def test_kg_mining_unravel_test_3(self):
+        base_URI = "http://example.org/"
+        a = URIRef(base_URI + "a")
+        b = URIRef(base_URI + "b")
+
+        kg = KgMining("test_files/unravel-test-3.ttl")
+        print("Parsed input")
+        depth = 0
+        # start_time = time.time()
+        # print("Started timing")
+        # 3
+        fc = kg.build_formal_context({a, b}, depth)
         l = fc.lattice
         # end_time = time.time()
         # l = fc.lattice.graphviz(view=True)
