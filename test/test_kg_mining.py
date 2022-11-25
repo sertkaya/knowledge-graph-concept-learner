@@ -37,24 +37,24 @@ class TestKgMining:
         depth = 2
         start_time = time.time()
         print("Started timing")
-        # 3
-        # fc = kg.build_formal_context({germany, poland, france}, depth)
-        # 4
+        # 3 objects
+        fc = kg.build_formal_context({germany, poland, france}, depth)
+        # 4 objects
         # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands}, depth)
-        # 5
+        # 5 objects
         # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic }, depth)
-        # 6
+        # 6 objects
         # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia}, depth)
-        # 7
+        # 7 objects
         # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia}, depth)
-        # 10
+        # 10 objects
         # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia, slovakia, slovenia, belgium}, depth)
-        # 15
+        # 15 objects
         # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia, slovakia, slovenia, belgium, croatia,
         #                              ireland, sweden, finland, denmark, luxembourg}, depth)
-        # 20
-        fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia, slovakia, slovenia, belgium, croatia,
-                                      cyprus, malta, ireland, sweden, finland, denmark, luxembourg, spain, romania, hungary}, depth)
+        # 20 objects
+        # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia, slovakia, slovenia, belgium, croatia,
+        #                               cyprus, malta, ireland, sweden, finland, denmark, luxembourg, spain, romania, hungary}, depth)
         # print("Built formal context")
         l = fc.lattice
         end_time = time.time()
@@ -64,14 +64,14 @@ class TestKgMining:
         # print(fc.properties)
         print("Number of concepts: " + str(len(l)))
         print("Execution time:" + str(end_time - start_time))
-        # for extent, intent in l:
-        #     print(extent)
+        for extent, intent in l:
+            print(intent)
         #     print(intent)
         #     print(len(intent))
-        #     print("=====================================================")
-        for c in l:
-            print(c)
             print("=====================================================")
+        # for c in l:
+        #     print(c)
+        #     print("=====================================================")
 
 
     def test_kg_mining_example_paper(self):
