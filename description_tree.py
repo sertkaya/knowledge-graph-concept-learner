@@ -1,6 +1,5 @@
 from rdflib import URIRef
 import copy
-from line_profiler_pycharm import profile
 import math
 from functools import total_ordering
 
@@ -39,7 +38,8 @@ class DescriptionTree:
         for l in sorted(labels):
             key += hex(id(l)) + "_"
         for edge in sorted(edges.keys()):
-            key += hex(id(edge)) + "("
+            # key += hex(id(edge)) + "("
+            key += str(edge) + "("
             for c in sorted(edges.get(edge)):
                 key += self.compute_key(self, c.labels, c.edges)
             key += ")"
@@ -108,13 +108,11 @@ class DescriptionTree:
             string += " ⊓ "
         i = 0
         for edge in edges:
-            # print("edge:" + str(edge))
             children = self.edges.get(edge)
             len_children = len(children)
             j = 0
             for c in children:
                 string += "∃" + edge.n3(self.dg.graph.namespace_manager) + ".("
-                # print("c:" + str(c))
                 string += c.to_str()
                 string += ")"
                 # just to avoid trailing ⊓
