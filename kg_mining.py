@@ -1,13 +1,8 @@
 from rdflib import URIRef
 from description_graph import DescriptionGraph
 from description_tree import DescriptionTree
-from itertools import chain, combinations
+from utils import powerset
 from concepts import Context
-
-def powerset(iterable):
-    s = list(iterable)
-    return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
-
 
 RDF_TYPE = URIRef("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
 OWL_THING = URIRef("http://www.w3.org/2002/07/owl#thing")
