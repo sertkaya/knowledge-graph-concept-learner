@@ -3,7 +3,6 @@ from description_graph import DescriptionGraph
 from description_tree import DescriptionTree
 from itertools import chain, combinations
 from concepts import Context
-from line_profiler_pycharm import profile
 
 def powerset(iterable):
     s = list(iterable)

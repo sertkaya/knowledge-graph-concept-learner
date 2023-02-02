@@ -38,7 +38,7 @@ class TestKgMining:
         start_time = time.time()
         print("Started timing")
         # 3 objects
-        fc = kg.build_formal_context({germany, poland, france}, depth)
+        # fc = kg.build_formal_context({germany, poland, france}, depth)
         # 4 objects
         # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands}, depth)
         # 5 objects
@@ -48,7 +48,7 @@ class TestKgMining:
         # 7 objects
         # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia}, depth)
         # 10 objects
-        # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia, slovakia, slovenia, belgium}, depth)
+        fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia, slovakia, slovenia, belgium}, depth)
         # 15 objects
         # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia, slovakia, slovenia, belgium, croatia,
         #                              ireland, sweden, finland, denmark, luxembourg}, depth)
