@@ -36,7 +36,8 @@ class DescriptionTree:
     def compute_key(self, labels, edges):
         key = ""
         for l in sorted(labels):
-            key += hex(id(l)) + "_"
+            # key += hex(id(l)) + "_"
+            key += str(l) + "_"
         for edge in sorted(edges.keys()):
             # key += hex(id(edge)) + "("
             key += str(edge) + "("

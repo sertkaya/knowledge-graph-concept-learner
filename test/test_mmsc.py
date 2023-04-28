@@ -25,3 +25,14 @@ class TestMMSC:
 
         end_time = time.time()
         print("Execution time:" + str(end_time - start_time))
+
+    def test_mmsc_example_product_5(self):
+        kg = KgMining("test_files/example-product-5.ttl")
+        base_URI = "http://example.org/"
+        x1 = URIRef(base_URI + "x1")
+        x2 = URIRef(base_URI + "x2")
+        depth = 2
+        individuals = {x1, x2}
+        depth = 1
+        mmsc = kg.mmsc(individuals, depth)
+        print("mmsc:" + mmsc.to_str())

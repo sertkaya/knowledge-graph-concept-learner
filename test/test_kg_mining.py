@@ -31,10 +31,24 @@ class TestKgMining:
     romania = URIRef(base_URI + "Q218")
     bulgaria = URIRef(base_URI + "Q219")
 #
-    def test_kg_mining(self):
+    def test_mmsc(self):
         kg = KgMining("test_files/test-eu-members-rdf.ttl")
         print("Parsed input")
         depth = 2
+        start_time = time.time()
+        print("Started timing")
+        individuals = {germany, poland, france, czech_republic, slovakia, slovenia, belgium, croatia } #, estonia, latvia,
+                                       # kingdom_netherlands, cyprus, malta, ireland, sweden, finland, denmark, luxembourg, spain, romania, hungary}
+        mmsc = kg.mmsc(individuals,depth)
+        print("mmsc:" + mmsc.to_str())
+
+        end_time = time.time()
+        print("Execution time:" + str(end_time - start_time))
+
+    def test_kg_mining(self):
+        kg = KgMining("test_files/test-eu-members-rdf.ttl")
+        print("Parsed input")
+        depth = 1
         start_time = time.time()
         print("Started timing")
         # 3 objects
@@ -48,10 +62,10 @@ class TestKgMining:
         # 7 objects
         # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia}, depth)
         # 10 objects
-        fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia, slovakia, slovenia, belgium}, depth)
+        # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia, slovakia, slovenia, belgium}, depth)
         # 15 objects
-        # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia, slovakia, slovenia, belgium, croatia,
-        #                              ireland, sweden, finland, denmark, luxembourg}, depth)
+        fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia, slovakia, slovenia, belgium, croatia,
+                                     ireland, sweden, finland, denmark, luxembourg}, depth)
         # 20 objects
         # fc = kg.build_formal_context({germany, poland, france, kingdom_netherlands, czech_republic, estonia, latvia, slovakia, slovenia, belgium, croatia,
         #                               cyprus, malta, ireland, sweden, finland, denmark, luxembourg, spain, romania, hungary}, depth)
@@ -84,7 +98,7 @@ class TestKgMining:
 
         kg = KgMining("test_files/example-paper.ttl")
         print("Parsed input")
-        depth = 1
+        depth = 2
         # start_time = time.time()
         # print("Started timing")
         # 3
@@ -117,7 +131,7 @@ class TestKgMining:
 
         kg = KgMining("test_files/unravel-test-3.ttl")
         print("Parsed input")
-        depth = 0
+        depth = 2
         # start_time = time.time()
         # print("Started timing")
         # 3
