@@ -1,0 +1,45 @@
+{
+	'ex:x1': {
+		'ex:r1': 'ex:y1',
+		'ex:r2': 'ex:z1',
+		'rdf:type': ['ex:M', 'ex:F'],
+	},
+	'ex:x2': {
+		'ex:r1': ['ex:y2', 'ex:z2'],
+		'rdf:type': ['ex:M', 'ex:F'],
+	},
+	'ex:x3': {
+		'ex:r1': 'ex:z3',
+		'ex:r2': 'ex:y3',
+		'rdf:type': 'ex:F',
+	},
+	'ex:x4': {
+		'ex:r2': 'ex:y4',
+		'ex:r1': 'ex:z4',
+		'rdf:type': 'ex:F',
+	},
+	'ex:y1': {
+		'rdf:type': ['ex:B', 'ex:A'],
+	},
+	'ex:y2': {
+		'rdf:type': 'ex:A',
+	},
+	'ex:y3': {
+		'rdf:type': 'ex:A',
+	},
+	'ex:y4': {
+		'rdf:type': 'ex:C',
+	},
+	'ex:z1': {
+		'rdf:type': ['ex:B', 'ex:C'],
+	},
+	'ex:z2': {
+		'rdf:type': 'ex:B',
+	},
+	'ex:z3': {
+		'rdf:type': 'ex:B',
+	},
+	'ex:z4': {
+		'rdf:type': 'ex:D',
+	},
+}

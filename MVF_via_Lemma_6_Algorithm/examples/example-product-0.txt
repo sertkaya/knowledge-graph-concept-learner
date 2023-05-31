@@ -1,0 +1,8 @@
+{
+	'ex:x1': {
+		'rdf:type': ['ex:M', 'ex:F'],
+	},
+	'ex:x2': {
+		'rdf:type': 'ex:M',
+	},
+}

@@ -1,0 +1,22 @@
+{
+	'ex:x1': {
+		'rdf:type': ['ex:F', 'ex:M'],
+		'ex:r1': ['ex:z1', 'ex:y1'],
+	},
+	'ex:x2': {
+		'rdf:type': ['ex:F', 'ex:M'],
+		'ex:r1': ['ex:y2', 'ex:z2'],
+	},
+	'ex:y1': {
+		'rdf:type': ['ex:B', 'ex:A', 'ex:C'],
+	},
+	'ex:y2': {
+		'rdf:type': ['ex:D', 'ex:B', 'ex:A'],
+	},
+	'ex:z1': {
+		'rdf:type': ['ex:C', 'ex:D', 'ex:B'],
+	},
+	'ex:z2': {
+		'rdf:type': ['ex:C', 'ex:E', 'ex:B'],
+	},
+}
