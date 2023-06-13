@@ -1,8 +1,9 @@
 import unittest
 import tempfile
+import os
 
 import networkx as nx
-from rdflib import Graph, Namespace, URIRef
+from rdflib import Graph, Namespace, Literal, URIRef
 
 
 class TestMVF(unittest.TestCase):
