@@ -1,167 +1,51 @@
-# Importing the libraries
-from collections import defaultdict
-from typing import Dict, List, Tuple
-
+import networkx as nx
+from rdflib import Graph, Namespace, URIRef
 '''
-The below code is a python script for Computing MVF algorithm via Lemma 6.
-The following steps are implemented in this python script:
-    Input to be given: A description graph G = (V,E,L) and a vertex v ∈ V
-    Expected Output: The MVF of v in G, i.e., mvf(G, v)
-        1. V^* ← SCC(G)
-        2. E^* ← condense(G, V^*)
-        3. G^*   (V^*, E^*)
-        4. for V^' ← V^* do
-        5.	 wgt[V^']  ← null
-        6. return maxWeight(G^*,scc(G,v), wgt)
-        // Auxiliary Function
-        7. Function maxWeight(G^*, V^',wgt):
-        8.  current  ← 0
-        9.  for W^' ∈ {U^'∈V^* | (V^',U^' )∈ E^*} do
-        10.     if wgt[W^'] = null then
-        11.         current  ← max(current, maxWeight(G^*, W^',wgt))
-        12.     else
-        13.         current  ← wgt[W^']
-        14.     wgt[V^']   current + |V^' |
-        15. return wgt[V^']
-
+The below code is a python script for Computing MVF algorithm via Lemma 6 using rdflib
 '''
 
-# Read the file and assign the values to variable G
-file_path = 'C:/Users/prana/Desktop/Masters Thesis/MVF_via_Lemma_6_Algorithm/examples/example-product-1.txt'
+# Read .ttl file and create a directed graph
+g = Graph()
+g.parse("C:/Users/prana/Desktop/Masters Thesis/test_files/example-product-1.ttl", format="turtle")
 
-with open(file_path, 'r') as file:
-    G = eval(file.read())
+# Create directed graph
+DG = nx.DiGraph()
 
+ex = Namespace("http://example.org/")
+rdf_type = URIRef("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
 
-def SCC(G: Dict[str, List[str]]) -> List[List[str]]:
-    """
-    Finds the strongly connected components in a graph using Tarjan's algorithm.
-
-    Args:
-        G: The input graph.
-
-    Returns:
-        A list of lists, where each inner list is a strongly connected component.
-    """
-    index = {}
-    lowlink = {}
-    stack = []
-    result = []
-    idx = [0]
-
-    def visit(v):
-        index[v] = idx[0]
-        lowlink[v] = idx[0]
-        idx[0] += 1
-        stack.append(v)
-
-        for w in G.get(v, []):
-            if w not in index:
-                visit(w)
-                lowlink[v] = min(lowlink[v], lowlink[w])
-            elif w in stack:
-                lowlink[v] = min(lowlink[v], index[w])
-
-        if lowlink[v] == index[v]:
-            scc = []
-            while True:
-                w = stack.pop()
-                scc.append(w)
-                if w == v:
-                    break
-            result.append(scc)
-
-    for v in G.keys():
-        if v not in index:
-            visit(v)
-
-    return result
+for s, p, o in g:
+    if p != rdf_type:
+        DG.add_edge(str(s), str(o))
 
 
-def condense(G: Dict[str, List[str]], sccs: List[List[str]]) -> Tuple[Dict[str, List[str]], Dict[str, List[str]]]:
-    """
-    Condenses a graph by collapsing strongly connected components into a single vertex.
-
-    Args:
-        G: The input graph.
-        sccs: The strongly connected components of the graph.
-
-    Returns:
-        A tuple containing the condensed graph and the mapping from original vertices to the new vertices.
-    """
-    cmap = {v: i for i, scc in enumerate(sccs) for v in scc}
-    cond = defaultdict(list)
-    for v, edges in G.items():
-        for w in edges:
-            if cmap[v] != cmap[w]:
-                cond[cmap[v]].append(cmap[w])
-    return dict(cond), cmap
-
-
-def maxWeight(G: Dict[str, List[str]], v: str, wgt: Dict[str, int]) -> int:
-    """
-    Finds the maximum weight of a vertex in a directed graph.
-
-    Args:
-        G: The input graph.
-        v: The starting vertex.
-        wgt: A dictionary mapping vertices to their weights.
-
-    Returns:
-        The maximum weight of a vertex in the graph.
-    """
-    if wgt[v] is not None:
-        return wgt[v]
+# Define maxWeight function
+def maxWeight(G, V, wgt, size):
     current = 0
-    for w in G.get(v, []):
-        if wgt[w] is None:
-            current = max(current, maxWeight(G, w, wgt))
+    for W in [U for U in G if (V, U) in G.edges()]:
+        if wgt[W] is None:
+            current = max(current, maxWeight(G, W, wgt, size))
         else:
-            current = max(current, wgt[w])
-    wgt[v] = current + len(G[v])
-    return wgt[v]
+            current = max(current, wgt[W])
+    wgt[V] = current + size[V]
+    return wgt[V]
 
 
-# Algorithm implementation
-sccs = SCC(G)
-cond, cmap = condense(G, sccs)
-G_condensed = {i: [] for i in range(len(sccs))}
-for v, edges in cond.items():
-    for w in edges:
-        G_condensed[v].append(w)
+# Implementing the Algorithm
+def calculate_MVF(v):
+    SCC = list(nx.strongly_connected_components(DG))
+    node_to_scc_map = {node: i for i, comp in enumerate(SCC) for node in comp}
+    scc_size_map = {i: len(comp) for i, comp in enumerate(SCC)}
+    SCC_graph = nx.DiGraph()
+    for node in node_to_scc_map:
+        SCC_graph.add_node(node_to_scc_map[node])
+    for edge in DG.edges():
+        if node_to_scc_map[edge[0]] != node_to_scc_map[edge[1]]:
+            SCC_graph.add_edge(node_to_scc_map[edge[0]], node_to_scc_map[edge[1]])
+    wgt = {node: None for node in SCC_graph.nodes()}
+    mvf = maxWeight(SCC_graph, node_to_scc_map[v], wgt, scc_size_map)
+    return mvf
 
-wgt = {i: None for i in range(len(sccs))}
 
-
-v_scc1 = cmap['ex:x1']
-v_scc2 = cmap['ex:y1']
-v_scc3 = cmap['ex:z1']
-v_scc4 = cmap['ex:x2']
-v_scc5 = cmap['ex:y2']
-v_scc6 = cmap['ex:z2']
-
-mvf1 = maxWeight(G_condensed, v_scc1, wgt)
-mvf2 = maxWeight(G_condensed, v_scc2, wgt)
-mvf3 = maxWeight(G_condensed, v_scc3, wgt)
-mvf4 = maxWeight(G_condensed, v_scc4, wgt)
-mvf5 = maxWeight(G_condensed, v_scc5, wgt)
-mvf6 = maxWeight(G_condensed, v_scc6, wgt)
-
-print(f"The MVF of 'ex:x1' in G is {mvf1}")  # Output is 3
-print(f"The MVF of 'ex:y1' in G is {mvf2}")
-print(f"The MVF of 'ex:z1' in G is {mvf3}")
-print(f"The MVF of 'ex:x2' in G is {mvf4}")
-print(f"The MVF of 'ex:y2' in G is {mvf5}")
-print(f"The MVF of 'ex:z2' in G is {mvf6}")
-
-'''
-1. Explanation of why The MVF of 'ex:x1' in G is 3?
-
-In the given graph G, the MVF of 'ex:x1' is 3, as it has three edges connected to it 
-(i.e., 'rdf:type', 'ex:r1', and 'ex:r2').
-
-2. Explanation of why The MVF of 'ex:y1'/'ex:z1' in G is 1?
-
-In the given graph, the maximum vertex frequency of 'ex:y1' and 'ex:z1' would be 1, 
-as they are only referenced once as the object of the 'ex:r1' and 'ex:r2' properties of the vertex 'ex:x1'.
-'''
+# Calculate MVF for node: x1
+print("The MVF of node is : ", calculate_MVF("http://example.org/x1"))
