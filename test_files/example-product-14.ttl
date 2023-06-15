@@ -1,0 +1,26 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ex: <http://example.org/> .
+
+ex:x1 ex:govern ex:x3 .
+ex:x1 ex:partof ex:x5 .
+ex:x1 rdf:type ex:City.
+
+ex:x3 rdf:type ex:Party .
+ex:x3 rdf:type ex:Liberal .
+
+ex:x5 ex:capital ex:x6 .
+ex:x5 rdf:type ex:Region .
+
+ex:x2 ex:govern ex:x4 .
+ex:x2 ex:partof ex:x7 .
+ex:x2 rdf:type ex:City .
+
+ex:x4 rdf:type ex:Party .
+ex:x4 rdf:type ex:Organization .
+
+ex:x7 ex:capital ex:x2 .
+ex:x7 rdf:type ex:Region .
+
+
+ex:x6 ex:test ex:x2 .
+ex:x7 ex:test ex:x1 .
